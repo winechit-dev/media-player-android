@@ -4,6 +4,7 @@ import android.net.Uri
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.FrameLayout
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,14 +35,12 @@ import androidx.media3.ui.PlayerView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 fun VideoPlayer(
     modifier: Modifier = Modifier,
     uri: Uri,
-    isPlay: Boolean,
-    onDoubleClick: () -> Unit
+    isPlay: Boolean
 ) {
     val context = LocalContext.current
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
@@ -83,13 +82,11 @@ fun VideoPlayer(
 
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
-
+                Lifecycle.Event.ON_RESUME -> {
+                   if (isPlay) exoPlayer.play()
+                }
                 Lifecycle.Event.ON_PAUSE -> {
                     exoPlayer.pause()
-                }
-
-                Lifecycle.Event.ON_STOP -> {
-                    exoPlayer.stop()
                 }
 
                 Lifecycle.Event.ON_DESTROY -> {
@@ -107,20 +104,10 @@ fun VideoPlayer(
         }
     }
 
+
     BoxWithConstraints {
         AndroidView(
-            modifier = modifier
-                .fillMaxSize()
-                .combinedClickable(
-                    onClick = {
-                        if (exoPlayer.isPlaying) {
-                            exoPlayer.pause()
-                        } else {
-                            exoPlayer.play()
-                        }
-                    },
-                    onDoubleClick = onDoubleClick
-                ),
+            modifier = modifier.fillMaxSize(),
             factory = { playerView }
         )
     }

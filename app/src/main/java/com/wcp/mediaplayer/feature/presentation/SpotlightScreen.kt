@@ -1,7 +1,6 @@
 package com.wcp.mediaplayer.feature.presentation
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.MoreVert
@@ -23,6 +21,7 @@ import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,11 +29,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.wcp.mediaplayer.component.FavoriteAnimatedIcon
+import com.wcp.mediaplayer.component.ControlIcon
 import com.wcp.mediaplayer.component.UserAction
 import com.wcp.mediaplayer.component.VideoPlayer
 import com.wcp.mediaplayer.feature.domain.model.Spotlight
@@ -58,16 +56,27 @@ fun SpotlightScreen() {
             beyondBoundsPageCount = spotlights.size,
         ) { page ->
             val spotlight = spotlights[page]
+            var isPlay by remember { mutableStateOf(true) }
+
+            LaunchedEffect(key1 = pagerState.currentPage){
+                isPlay = page == pagerState.currentPage
+            }
+
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
                 VideoPlayer(
                     uri = spotlight.getVideoUrl(),
-                    isPlay = page == pagerState.currentPage,
-                    onDoubleClick = {
-                        showAnimationIcon = true
-                        viewModel.toggleFavourite(spotlight)
-                    }
+                    isPlay = isPlay,
+                    modifier = Modifier.combinedClickable(
+                        onClick = {
+                            isPlay = !isPlay
+                        },
+                        onDoubleClick = {
+                            showAnimationIcon = true
+                            viewModel.toggleFavourite(spotlight)
+                        }
+                    )
                 )
 
                 FooterUserAction(
@@ -89,6 +98,7 @@ fun SpotlightScreen() {
                         }
                     )
                 }
+                ControlIcon(isPlay = isPlay)
             }
         }
     }

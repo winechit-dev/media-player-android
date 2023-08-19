@@ -24,36 +24,45 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import com.wcp.mediaplayer.ui.theme.DARK_TRANSPARENT
 import kotlinx.coroutines.delay
 
 @SuppressLint("PrivateResource")
 @Composable
-fun PlayIcon(isPlay: Boolean) {
-    val isPlaying by remember { mutableStateOf(isPlay) }
+fun ControlIcon(isPlay: Boolean) {
 
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Icon(
-            painter = painterResource(
-                id = if (isPlaying) {
-                    androidx.media3.ui.R.drawable.exo_icon_play
-                } else {
-                    androidx.media3.ui.R.drawable.exo_icon_pause
-                }
-            ),
-            contentDescription = "iconResId",
-            modifier = Modifier
-                .size(56.dp)
-                .clip(CircleShape)
-                .background(color = DARK_TRANSPARENT),
-            tint = Color.White
-        )
+    var showControl by remember { mutableStateOf(false) }
+
+    LaunchedEffect(key1 = isPlay) {
+        showControl = true
+        delay(1500L)
+        showControl = false
     }
+
+    if (showControl) {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Icon(
+                painter = painterResource(
+                    id = if (!isPlay) {
+                        androidx.media3.ui.R.drawable.exo_icon_play
+                    } else {
+                        androidx.media3.ui.R.drawable.exo_icon_pause
+                    }
+                ),
+                contentDescription = "iconResId",
+                modifier = Modifier
+                    .size(56.dp)
+                    .clip(CircleShape)
+                    .background(color = DARK_TRANSPARENT),
+                tint = Color.White
+            )
+        }
+    }
+
 }
 
 
@@ -72,6 +81,6 @@ private fun PlayIconPreview(
     @PreviewParameter(PlayButtonPreviewParameterProvider::class) isPlay: Boolean
 ) {
     Surface {
-        PlayIcon(isPlay = isPlay)
+        ControlIcon(isPlay = isPlay)
     }
 }
